@@ -10,7 +10,7 @@
 
 This project develops a **small language model (SLM)** for the Toaripi language to support **language preservation** and **education**. The model is trained on aligned English↔Toaripi Bible text and designed to generate original educational content for primary school learners and teachers.
 
-## 🎯 Project Mission##
+## 🎯 Project Mission
 
 **Empower local educators with AI tools** that create culturally relevant, age-appropriate learning materials while preserving the Toaripi language through:**Empower local educators with AI tools** that create culturally relevant, age-appropriate learning materials while preserving the Toaripi language through:
 
