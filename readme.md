@@ -12,7 +12,7 @@ This project develops a **small language model (SLM)** for the Toaripi language 
 
 ## 🎯 Project Mission
 
-**Empower local educators with AI tools** that create culturally relevant, age-appropriate learning materials while preserving the Toaripi language through:**Empower local educators with AI tools** that create culturally relevant, age-appropriate learning materials while preserving the Toaripi language through:
+**Empower local educators with AI tools** that create culturally relevant learning materials while preserving the Toaripi language through:
 
 - 📚 **Original educational content generation** (stories, vocabulary, Q&A, dialogues)- 📚 **Original educational content generation** (stories, vocabulary, Q&A, dialogues)
 
@@ -30,13 +30,17 @@ This project develops a **small language model (SLM)** for the Toaripi language 
 
 - Generate original educational content (stories, vocabulary lists, comprehension questions) for primary school learners and teachers.
 
-- Create age-appropriate stories and vocabulary exercisesWork both online and offline, including on low-resource devices like Raspberry Pi, through model quantization and lightweight deployment.
+- Create educational stories and vocabulary exercises
 
-- Generate reading comprehension questions and dialoguesBe open-source, hosted on GitHub with clear documentation, scripts, and contribution guidelines to invite collaboration from developers, linguists, and the Toaripi-speaking community.
+- Work both online and offline, including on low-resource devices like Raspberry Pi, through model quantization and lightweight deployment.
+
+- Generate reading comprehension questions and dialogues
+
+- Be open-source, hosted on GitHub with clear documentation, scripts, and contribution guidelines to invite collaboration from developers, linguists, and the Toaripi-speaking community.
 
 - Produce culturally relevant educational materials in Toaripi
 
-The ultimate goal is to empower local educators with AI tools that create culturally relevant, age-appropriate learning materials while preserving the Toaripi language.
+The ultimate goal is to empower local educators with AI tools that create culturally relevant learning materials while preserving the Toaripi language.
 
 ### 💻 **Flexible Deployment**
 
@@ -268,7 +272,7 @@ docker run -p 8000:8000 -v ./models:/app/models toaripi-slm:pi
 
 We welcome contributions from:
 - **Toaripi speakers**: Language validation, cultural context, content review
-- **Educators**: Curriculum alignment, age-appropriateness feedback
+- **Educators**: Curriculum alignment, educational content feedback
 - **Linguists**: Language structure insights, evaluation metrics
 - **Developers**: Code improvements, new features, bug fixes
 
@@ -337,7 +341,7 @@ See [CONTRIBUTING.md](docs/contributing/guidelines.md) for detailed guidelines.
 
 ### Evaluation Metrics
 - **Language Quality**: Fluency, grammatical correctness
-- **Educational Value**: Age-appropriateness, curriculum alignment
+- **Educational Value**: Curriculum alignment, learning effectiveness
 - **Cultural Relevance**: Community feedback, expert review
 - **Technical Performance**: Speed, memory usage, reliability
 
