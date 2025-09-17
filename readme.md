@@ -1,4 +1,4 @@
-# Toaripi SLM — Educational Content Generator 🏫# Toaripi SLM — Educational Content Generator 🏫
+# Toaripi SLM — Educational Content Generator 🏫
 
 
 
