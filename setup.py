@@ -24,7 +24,7 @@ setup(
     name="toaripi-slm",
     version="0.1.0",
     author="Toaripi SLM Contributors",
-    author_email="cknzraposo@gmail.com",
+    author_email="ck@raposo.ai",
     description="A small language model for generating educational content in Toaripi language",
     long_description=long_description,
     long_description_content_type="text/markdown",
