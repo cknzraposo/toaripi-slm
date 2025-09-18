@@ -50,7 +50,7 @@ This project develops a **small language model (SLM)** for the Toaripi language 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/toaripi-slm.git
+git clone https://github.com/cknzraposo/toaripi-slm.git
 cd toaripi-slm
 
 # Create and activate virtual environment

@@ -1,0 +1,27 @@
+# Include base requirements
+-r requirements.txt
+
+# Testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-benchmark>=4.0.0
+
+# Code quality tools
+black>=23.7.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.5.0
+bandit>=1.7.5
+
+# Pre-commit hooks
+pre-commit>=3.3.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.0.0
+
+# Jupyter for development
+jupyter>=1.0.0
+notebook>=6.5.0
+ipykernel>=6.25.0

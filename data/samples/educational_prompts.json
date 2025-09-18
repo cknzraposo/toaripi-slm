@@ -1,0 +1,47 @@
+{
+  "story_prompts": [
+    {
+      "id": "story_001",
+      "topic": "family_activities",
+      "prompt": "Write a simple story about a family preparing food together",
+      "age_group": "primary",
+      "length": "short",
+      "learning_objectives": ["family vocabulary", "cooking verbs", "cooperation"]
+    },
+    {
+      "id": "story_002",
+      "topic": "nature_exploration",
+      "prompt": "Tell a story about children discovering animals in the forest",
+      "age_group": "primary",
+      "length": "medium",
+      "learning_objectives": ["animal names", "forest vocabulary", "exploration"]
+    }
+  ],
+  "vocabulary_prompts": [
+    {
+      "id": "vocab_001",
+      "topic": "household_items",
+      "prompt": "Create a list of 10 common household items with Toaripi names",
+      "age_group": "primary",
+      "format": "list",
+      "include_examples": true
+    },
+    {
+      "id": "vocab_002",
+      "topic": "food_items",
+      "prompt": "Generate vocabulary for traditional foods and cooking",
+      "age_group": "primary",
+      "format": "flashcards",
+      "include_examples": true
+    }
+  ],
+  "comprehension_prompts": [
+    {
+      "id": "comp_001",
+      "text_topic": "fishing_trip",
+      "prompt": "Write a short paragraph about fishing, then create 3 questions",
+      "age_group": "primary",
+      "question_types": ["who", "what", "where"]
+    }
+  ]
+}

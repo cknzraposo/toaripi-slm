@@ -1,0 +1,39 @@
+# Data preprocessing configuration for Toaripi SLM
+data_sources:
+  english:
+    type: "web_kjv"
+    cache_dir: "./data/cache/english"
+    url: "https://www.gutenberg.org/files/10/10-0.txt"
+  toaripi:
+    type: "local_csv"
+    path: "./data/raw/toaripi_bible.csv"
+    encoding: "utf-8"
+
+preprocessing:
+  text_cleaning:
+    min_length: 10
+    max_length: 512
+    remove_duplicates: true
+    normalize_unicode: true
+    strip_whitespace: true
+  
+  alignment:
+    method: "sentence_align"
+    similarity_threshold: 0.7
+    max_ratio: 3.0
+  
+  filtering:
+    remove_empty: true
+    remove_non_text: true
+    language_detection: true
+
+output:
+  format: "csv"
+  encoding: "utf-8"
+  columns: ["english", "toaripi", "verse_id", "book", "chapter"]
+  
+validation:
+  test_split: 0.1
+  dev_split: 0.05
+  random_seed: 42
+  stratify_by: "book"

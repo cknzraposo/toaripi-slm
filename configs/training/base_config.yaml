@@ -1,0 +1,50 @@
+# Basic training configuration for development/testing
+model:
+  name: "microsoft/DialoGPT-medium"
+  cache_dir: "./models/cache"
+  trust_remote_code: false
+
+training:
+  # Training hyperparameters
+  epochs: 3
+  learning_rate: 2e-5
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  warmup_steps: 100
+  weight_decay: 0.01
+  
+  # Evaluation and saving
+  eval_strategy: "steps"
+  eval_steps: 500
+  save_strategy: "steps"
+  save_steps: 500
+  logging_steps: 100
+  
+  # Early stopping
+  early_stopping_patience: 3
+  early_stopping_threshold: 0.001
+
+data:
+  max_length: 512
+  padding: true
+  truncation: true
+  return_tensors: "pt"
+
+optimization:
+  optimizer: "adamw"
+  lr_scheduler_type: "linear"
+  fp16: false  # Set to true if GPU supports it
+  dataloader_pin_memory: true
+  remove_unused_columns: false
+
+output:
+  checkpoint_dir: "./checkpoints"
+  save_total_limit: 3
+  push_to_hub: false
+  hub_model_id: ""
+
+logging:
+  use_wandb: false
+  project_name: "toaripi-slm"
+  run_name: "base-training"
+  log_level: "INFO"
