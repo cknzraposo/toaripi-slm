@@ -1,0 +1,45 @@
+{
+  "workflow_name": "demo_quickstart",
+  "started_at": "2025-09-20T23:08:01.261890",
+  "current_step": 0,
+  "steps": [
+    {
+      "name": "Demo Step",
+      "description": "Demonstrating workflow functionality",
+      "status": "completed",
+      "started_at": "2025-09-20T23:08:01.274833",
+      "completed_at": "2025-09-20T23:08:01.283247",
+      "result": {
+        "training": {
+          "model_name": "microsoft/DialoGPT-small",
+          "epochs": 2,
+          "learning_rate": 0.0001,
+          "batch_size": 2,
+          "gradient_accumulation_steps": 4,
+          "use_lora": true,
+          "lora_r": 8,
+          "max_length": 256
+        },
+        "data": {
+          "train_file": "demo.csv",
+          "validation_split": 0.1,
+          "test_split": 0.1
+        },
+        "output": {
+          "model_dir": "models/toaripi_beginner_20250920_230801",
+          "checkpoint_steps": 100,
+          "save_total_limit": 3
+        },
+        "system": {
+          "memory_gb": 15.694076538085938,
+          "cpu_count": 6,
+          "profile": "beginner"
+        }
+      },
+      "error": null
+    }
+  ],
+  "status": "started",
+  "results": {},
+  "errors": []
+}

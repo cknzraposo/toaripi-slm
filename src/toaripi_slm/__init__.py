@@ -18,7 +18,7 @@ Example usage:
 
 __version__ = "0.1.0"
 __author__ = "Toaripi SLM Contributors"
-__email__ = "cknzraposo@gmail.com"
+__email__ = "ck@raposo.ai"
 __license__ = "MIT"
 
 # Main imports

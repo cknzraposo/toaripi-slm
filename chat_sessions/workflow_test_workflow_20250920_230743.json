@@ -1,0 +1,21 @@
+{
+  "workflow_name": "test_workflow",
+  "started_at": "2025-09-20T23:07:43.047525",
+  "current_step": 0,
+  "steps": [
+    {
+      "name": "test_step",
+      "description": "Testing step functionality",
+      "status": "completed",
+      "started_at": "2025-09-20T23:07:43.059804",
+      "completed_at": "2025-09-20T23:07:43.066612",
+      "result": {
+        "result": "success"
+      },
+      "error": null
+    }
+  ],
+  "status": "started",
+  "results": {},
+  "errors": []
+}

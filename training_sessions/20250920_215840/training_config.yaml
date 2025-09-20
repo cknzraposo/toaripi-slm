@@ -1,0 +1,47 @@
+data:
+  max_length: 512
+  padding: true
+  return_tensors: pt
+  truncation: true
+logging:
+  log_level: INFO
+  project_name: toaripi-slm
+  run_name: base-training
+  use_wandb: true
+lora:
+  enabled: true
+  lora_alpha: 32
+  lora_dropout: 0.1
+  r: 16
+  target_modules:
+  - q_proj
+  - v_proj
+model:
+  cache_dir: ./models/cache
+  name: microsoft/DialoGPT-medium
+  trust_remote_code: false
+optimization:
+  dataloader_pin_memory: true
+  fp16: false
+  lr_scheduler_type: linear
+  optimizer: adamw
+  remove_unused_columns: false
+output:
+  checkpoint_dir: ./models/checkpoints
+  hub_model_id: ''
+  push_to_hub: false
+  save_total_limit: 3
+training:
+  batch_size: 4
+  early_stopping_patience: 3
+  early_stopping_threshold: 0.001
+  epochs: 3
+  eval_steps: 500
+  eval_strategy: steps
+  gradient_accumulation_steps: 4
+  learning_rate: 5.0
+  logging_steps: 100
+  save_steps: 500
+  save_strategy: steps
+  warmup_steps: 100
+  weight_decay: 0.01
