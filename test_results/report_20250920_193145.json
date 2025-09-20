@@ -1,0 +1,21 @@
+{
+  "test_date": "2025-09-20T19:32:00.105715",
+  "test_results": {
+    "basic_tests": {
+      "model_loading": true,
+      "tokenizer_loading": true,
+      "basic_generation": true,
+      "educational_prompts": true
+    },
+    "quality_tests": {
+      "content_appropriateness": 0.85,
+      "language_consistency": 0.78,
+      "educational_value": 0.82,
+      "cultural_sensitivity": 0.9
+    }
+  },
+  "summary": {
+    "overall_score": 0.91875,
+    "recommendations": []
+  }
+}
