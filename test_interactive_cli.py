@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from rich.console import Console
-from src.toaripi_slm.cli.commands.interact import BilingualDisplay, TokenWeight
+from src.toaripi_slm.cli.core import BilingualDisplay, TokenWeight
 
 def test_token_weight_visualization():
     """Test the token weight visualization system."""
@@ -30,18 +30,18 @@ def test_token_weight_visualization():
     
     # Test 1: Basic bilingual display with weights
     console.print("🎯 [green]Test 1: Basic Bilingual Display with Token Weights[/green]")
-    display.display_bilingual_content(english_text, toaripi_text, "story")
+    display.display(english_text, toaripi_text, "story")
     
     # Test 2: Display without weights
     console.print("\n🎯 [green]Test 2: Display without Token Weights[/green]")
     display.toggle_weights()
-    display.display_bilingual_content(english_text, toaripi_text, "story")
+    display.display(english_text, toaripi_text, "story")
     
     # Test 3: Re-enable weights and test alignment toggle
     console.print("\n🎯 [green]Test 3: Toggle Alignment (weights re-enabled)[/green]")
     display.toggle_weights()  # Re-enable weights
     display.toggle_alignment()  # Disable alignment
-    display.display_bilingual_content(english_text, toaripi_text, "story")
+    display.display(english_text, toaripi_text, "story")
     
     # Test 4: Test different content types
     console.print("\n🎯 [green]Test 4: Different Content Types[/green]")
@@ -51,13 +51,13 @@ def test_token_weight_visualization():
     vocab_toaripi = "Hanere potopoto peni bada-bada nene-ida"
     
     console.print("\n📚 [cyan]Vocabulary Example:[/cyan]")
-    display.display_bilingual_content(vocab_english, vocab_toaripi, "vocabulary")
+    display.display(vocab_english, vocab_toaripi, "vocabulary")
     
     dialogue_english = "Teacher: What did you learn? Student: I learned about fishing."
     dialogue_toaripi = "Amo-harigi: Ami na'a nene? Amo-nene: Mina na'a nene hanere."
     
     console.print("\n💬 [cyan]Dialogue Example:[/cyan]")
-    display.display_bilingual_content(dialogue_english, dialogue_toaripi, "dialogue")
+    display.display(dialogue_english, dialogue_toaripi, "dialogue")
     
     # Test 5: Individual token weight creation
     console.print("\n🎯 [green]Test 5: Individual Token Weight Examples[/green]")
@@ -75,7 +75,7 @@ def test_token_weight_visualization():
     for i, tw in enumerate(tokens):
         if i > 0:
             test_text.append(" ")
-        test_text.append(tw.token, style=tw.get_color_style())
+        test_text.append(tw.token, style=tw.color_style())
         test_text.append(f"({tw.weight:.1f})", style="dim white")
     
     console.print("Color Scale Example:")
@@ -83,7 +83,8 @@ def test_token_weight_visualization():
     
     # Show legend
     console.print("\n🎨 [green]Weight Legend:[/green]")
-    display.display_weight_legend()
+    # Access internal legend for test purposes
+    display._legend()
     
     console.print("\n✅ [bold green]All tests completed![/bold green]")
 

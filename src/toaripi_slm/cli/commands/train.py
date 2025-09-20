@@ -10,7 +10,7 @@ import sys
 import json
 import yaml
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any, Tuple, List
 from datetime import datetime
 
 import click
@@ -23,6 +23,96 @@ from rich.prompt import Confirm, Prompt, IntPrompt, FloatPrompt
 from rich import print as rprint
 
 console = Console()
+
+# -----------------------------
+# Model Versioning Helpers
+# -----------------------------
+
+REGISTRY_FILE = Path("./models/hf/registry.json")
+
+def _load_registry() -> Dict[str, Any]:
+    """Load existing model registry or create a new one."""
+    if REGISTRY_FILE.exists():
+        try:
+            with open(REGISTRY_FILE, "r") as f:
+                data = json.load(f)
+            # Basic validation
+            if not isinstance(data, dict) or "models" not in data:
+                raise ValueError("Invalid registry structure")
+            return data
+        except Exception:
+            # Backup corrupt file
+            backup = REGISTRY_FILE.with_suffix(".corrupt")
+            REGISTRY_FILE.rename(backup)
+            console.print(f"⚠️  Corrupt registry.json backed up to {backup}")
+    return {"registry_version": 1, "models": []}
+
+def _parse_version(ver: str) -> Tuple[int, int, int]:
+    """Parse semantic version string 'vMAJOR.MINOR.PATCH'."""
+    if ver.startswith('v'):
+        ver = ver[1:]
+    parts = ver.split('.')
+    if len(parts) != 3:
+        return (0, 0, 0)
+    try:
+        return tuple(int(p) for p in parts)  # type: ignore
+    except ValueError:
+        return (0, 0, 0)
+
+def _next_version(existing: List[str]) -> str:
+    """Determine next patch version given existing version strings."""
+    if not existing:
+        return "v0.0.1"
+    latest = sorted(existing, key=_parse_version)[-1]
+    major, minor, patch = _parse_version(latest)
+    patch += 1
+    return f"v{major}.{minor}.{patch}"
+
+def _register_trained_model(base_model: str, checkpoint_dir: str, training_config: Dict[str, Any]):
+    """Create a versioned directory and update registry metadata.
+
+    A new semantic patch version is assigned each successful training run.
+    The trained artifacts are expected in checkpoint_dir (as configured by user).
+    Only metadata is stored in version dir to avoid duplication.
+    """
+    registry = _load_registry()
+    existing_versions = [m.get("version") for m in registry.get("models", []) if m.get("version")]
+    version = _next_version(existing_versions)
+
+    version_dir = Path(f"./models/hf/{version}")
+    version_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create model_info.json
+    model_info = {
+        "version": version,
+        "base_model": base_model,
+        "created_at": datetime.now().isoformat(),
+        "checkpoint_dir": checkpoint_dir,
+        "training_config": {
+            "model": training_config.get("model", {}),
+            "training": training_config.get("training", {}),
+            "lora": training_config.get("lora", {}),
+            "optimization": training_config.get("optimization", {}),
+        }
+    }
+    with open(version_dir / "model_info.json", "w") as f:
+        json.dump(model_info, f, indent=2)
+
+    # Append to registry and persist
+    registry_entry = {
+        "version": version,
+        "path": str(version_dir),
+        "base_model": base_model,
+        "created_at": model_info["created_at"],
+        "checkpoint_dir": checkpoint_dir
+    }
+    registry.setdefault("models", []).append(registry_entry)
+    REGISTRY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(REGISTRY_FILE, "w") as f:
+        json.dump(registry, f, indent=2)
+
+    console.print(f"📦 Registered new model version: [green]{version}[/green] → {version_dir}")
+    return version
 
 class TrainingSession:
     """Manages a training session with state tracking."""
@@ -363,11 +453,23 @@ def train(config, data_dir, resume, interactive, dry_run):
         console.print("\n✅ [green]Training completed successfully![/green]")
         console.print(f"📁 Session saved to: {session_dir}")
         console.print(f"🤖 Model checkpoints: {training_config['output']['checkpoint_dir']}")
+
+        # Register trained model version
+        try:
+            version_assigned = _register_trained_model(
+                base_model=training_config.get("model", {}).get("name", "unknown"),
+                checkpoint_dir=training_config['output']['checkpoint_dir'],
+                training_config=training_config
+            )
+            console.print(f"🏷️  Model version assigned: [bold cyan]{version_assigned}[/bold cyan]")
+            console.print(f"Use with: [cyan]toaripi interact --version {version_assigned}[/cyan]")
+        except Exception as e:
+            console.print(f"⚠️  Failed to register model version: {e}")
         
         # Next steps
         console.print("\n🎉 [bold]Next Steps:[/bold]")
         console.print("  1. Test your model: [cyan]toaripi test[/cyan]")
-        console.print("  2. Generate content: [cyan]toaripi interact[/cyan]")
+        console.print("  2. Generate content: [cyan]toaripi interact --version <version>[/cyan]")
         console.print("  3. Export for edge deployment: [cyan]toaripi export[/cyan]")
         
     except KeyboardInterrupt:

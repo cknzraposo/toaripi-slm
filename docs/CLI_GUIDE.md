@@ -2,23 +2,29 @@
 
 A comprehensive CLI tool for training, testing, and interacting with the Toaripi Small Language Model for educational content generation.
 
-## Quick Start
+## Quick Start (Versioned Workflow)
 
 ```bash
-# Check system status
-toaripi status
-
-# Run system diagnostics
-toaripi doctor
-
-# Train a model (interactive mode)
+# 1. Train (registers new semantic patch version v0.0.X)
 toaripi train --interactive
 
-# Test the trained model
-toaripi test --model ./models/hf
+# 2. List model versions
+toaripi models list
 
-# Interactive chat with the model
-toaripi interact --model ./models/hf
+# 3. Interact with latest version (auto-selected)
+toaripi interact
+
+# 4. Pin a specific version
+toaripi interact --version v0.0.3
+
+# 5. Export model (adds manifest + checksums + quant placeholder)
+toaripi export --version v0.0.3 --quant q4_k_m
+
+# 6. Push to Hugging Face (optional)
+toaripi export --version v0.0.3 --push --repo-id yourname/toaripi-slm-v0-0-3
+
+# 7. Inspect saved interactive sessions
+toaripi sessions list
 ```
 
 ## Installation
@@ -127,25 +133,25 @@ toaripi test --interactive
 ```
 
 ### `toaripi interact`
-Interactive chat interface with the Toaripi SLM model.
+Interactive educational content & chat interface (version-aware).
 
 **Options:**
-- `--model, -m PATH`: Path to trained model (default: ./models/hf)
-- `--content-type, -t TYPE`: Default content type (story, vocabulary, dialogue, questions, translation)
-- `--temperature FLOAT`: Generation temperature (default: 0.7)
-- `--max-length INT`: Maximum generation length (default: 200)
-- `--save-session`: Automatically save session
+- `--version, -v VERSION`: Load a specific registered version (default: latest)
+- `--content-type, -t TYPE`: story | vocabulary | dialogue | questions | translation | chat
+- `--temperature FLOAT`: Sampling creativity (default 0.7)
+- `--max-length INT`: Max new tokens (default 200)
+- `--save-session`: Auto-save every 5 exchanges
 
 **Examples:**
 ```bash
-# Start interactive session
-toaripi interact --model ./models/hf
+# Start with latest model version
+toaripi interact
 
-# Start with specific content type
-toaripi interact --content-type vocabulary
+# Use a specific version & different defaults
+toaripi interact --version v0.0.7 --content-type dialogue --temperature 0.5
 
-# Adjust generation parameters
-toaripi interact --temperature 0.5 --max-length 150
+# Light Q&A (chat mode)
+toaripi interact --content-type chat
 ```
 
 ## Interactive Mode Commands
@@ -155,11 +161,14 @@ When using `toaripi interact`, you can use these commands within the chat:
 | Command | Description |
 |---------|-------------|
 | `/help` | Show help message |
-| `/type <content_type>` | Change content type (story, vocabulary, dialogue, questions, translation) |
+| `/type <content_type>` | Change content type (story, vocabulary, dialogue, questions, translation, chat) |
 | `/settings` | Adjust generation settings |
 | `/history` | Show conversation history |
 | `/save` | Save conversation to file |
 | `/clear` | Clear conversation history |
+| `/weights` | Toggle token weight visualization |
+| `/align` | Toggle bilingual token alignment padding |
+| `/legend` | Show token weight color legend |
 | `/quit` or `/exit` | Exit interactive mode |
 
 ## Content Types
@@ -210,35 +219,91 @@ Translate English educational content to Toaripi.
 ```yaml
 model:
   name: "microsoft/DialoGPT-medium"
-  cache_dir: "./models/cache"
+The Toaripi SLM CLI provides commands for training, versioning, testing, interacting with, and diagnosing the small language model focused on generating educational content in the Toaripi language.
 
 training:
-  epochs: 3
-  learning_rate: 2e-5
-  batch_size: 4
-  gradient_accumulation_steps: 4
+### Exporting Models (Checksums + Quant Placeholder)
 
-lora:
-  enabled: true
-  r: 16
-  lora_alpha: 32
-  target_modules: ["q_proj", "v_proj"]
+Prepare an export (creates versioned export directory with manifest, checksums, optional model card, and a GGUF placeholder stub):
+```bash
+toaripi export --version v0.0.5 --quant q4_k_m
+```
+If `--version` is omitted the latest model is used. The exporter now computes SHA256 checksums for core artifacts (e.g. `config.json`, `tokenizer.json`, `pytorch_model.bin` if present) and records them in `export_manifest.json` for reproducibility. A placeholder file under `gguf/` documents intended quantization settings; real conversion can later replace this.
 
-output:
-  checkpoint_dir: "./models/checkpoints"
-  save_total_limit: 3
-
-logging:
-  use_wandb: false
-  project_name: "toaripi-slm"
+Manifest snippet example:
+```json
+{
+   "version": "v0.0.5",
+   "quantization": "q4_k_m",
+   "checksums": {
+      "config.json": "sha256:...",
+      "tokenizer.json": "sha256:..."
+   },
+   "quantization_placeholder": {
+      "status": "placeholder",
+      "message": "Run scripts/quantize.py to produce real GGUF artifacts."
+   }
+}
 ```
 
+### Managing Sessions
+
+```bash
+# List saved sessions
+toaripi sessions list
+
+# Show metadata + first few exchanges
+toaripi sessions show session_20250920_181103.json
+
+# Replay (stream first 10 exchanges)
+toaripi sessions replay session_20250920_181103.json --limit 10
+```
+
+### Modular CLI Core
+
+| Module | Responsibility |
+|--------|----------------|
+| `cli/core/token_weights.py` | Simulated token weight generation (future: real attention) |
+| `cli/core/display.py` | Side-by-side bilingual rendering, weight legend, alignment toggles |
+| `cli/core/generator.py` | Thin wrapper over HF model directory (generation + chat) |
+| `cli/core/session.py` | Session state tracking & JSON persistence |
+| `cli/core/versioning.py` | Registry loading, version resolution, listing |
+| `cli/core/config.py` | Default generation parameter constants |
+| `cli/core/exporter.py` | Export manifest + checksums + quantization placeholder + Hub push |
+
+These abstractions keep `interact` orchestration-focused and make export/publishing reproducible.
+## Versioning Workflow Overview
+
+Each successful training run registers an incremental semantic patch version (v0.0.1, v0.0.2, ...):
+
+```
+models/hf/registry.json          # Global registry (list + metadata)
+models/hf/v0.0.X/model_info.json # Per-version metadata
+```
+
+Common tasks:
+```bash
+# Train and register new version
+toaripi train
+
+# List versions
+toaripi models list
+
+# Inspect version metadata
+toaripi models info v0.0.8
+
+# Interact with a pinned version
+toaripi interact --version v0.0.8
+```
 ### Data Preprocessing (`configs/data/preprocessing_config.yaml`)
 ```yaml
 input:
-  raw_data_dir: "./data/raw"
-  file_patterns: ["*.csv", "*.tsv"]
-
+### Roadmap
+* Real GGUF quantization pipeline integration
+* True attention-derived token weights
+* Enhanced alignment with subword mapping
+* Additional educational content templates (quizzes, cloze) 
+* Provenance: embed data + config hashes in model card
 processing:
   min_length: 5
   max_length: 512
@@ -285,6 +350,36 @@ toaripi doctor --detailed
 ```
 
 ## Troubleshooting
+
+## Publishing to Hugging Face Hub
+
+After training and registering a model version you can export and optionally push it to the Hub.
+
+1. Prepare export directory (includes manifest + model card):
+```bash
+toaripi export --version v0.0.5 --format gguf --quant q4_k_m
+```
+
+2. Push to your repository (set HF_TOKEN env var or pass --token):
+```bash
+export HF_TOKEN=hf_xxx   # or use a .env
+toaripi export --version v0.0.5 --push --repo-id yourname/toaripi-educational-v0-0-5
+```
+
+Options:
+* `--private` create a private repo
+* `--no-card` skip generating README.md
+* `--quant q4_k_m` recorded in manifest/model card (conversion still stub)
+
+Resulting layout:
+```
+models/gguf/v0.0.5/
+   export_manifest.json
+   README.md
+```
+
+The manifest captures version + base model + timestamp for reproducibility. When GGUF conversion is implemented, binary artifacts will be added beside the manifest.
+
 
 ### Common Issues
 

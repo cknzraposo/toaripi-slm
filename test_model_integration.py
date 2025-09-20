@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from src.toaripi_slm.cli.commands.interact import BilingualDisplay, ToaripiGenerator
+from src.toaripi_slm.cli.core import BilingualDisplay, ToaripiGenerator
 
 def test_model_integration():
     """Test the model integration capabilities."""
@@ -34,16 +34,15 @@ def test_model_integration():
     
     display = BilingualDisplay(console)
     generator = ToaripiGenerator(Path("./models/nonexistent"))
-    generator.load_model()
-    display.set_generator(generator)
+    generator.load()
     
     console.print("📝 [yellow]Chat Question:[/yellow] What is a dog?")
-    english_response, toaripi_response = generator.generate_chat_response("What is a dog?")
-    display.display_bilingual_content(english_response, toaripi_response, "chat")
+    eng, tqo = generator.bilingual("What is a dog?", content_type="chat", max_length=40, temperature=0.7)
+    display.display(eng, tqo, "chat")
     
     console.print("\n📝 [yellow]Story Generation:[/yellow] Tell a story about fishing")
-    english_content, toaripi_content = generator.generate_bilingual_content("Tell a story about fishing", "story")
-    display.display_bilingual_content(english_content, toaripi_content, "story")
+    eng2, tqo2 = generator.bilingual("Tell a story about fishing", content_type="story", max_length=60, temperature=0.7)
+    display.display(eng2, tqo2, "story")
     
     # Test 2: Check for real model availability
     console.print("\n🔍 [green]Test 2: Checking for Trained Models[/green]")
@@ -70,22 +69,16 @@ def test_model_integration():
     
     if found_models:
         console.print(f"\n🎯 [green]Test 3: Attempting to Load Real Model[/green]")
-        
         # Try to load the first found model
         model_path = found_models[0]
         console.print(f"Loading model from: [cyan]{model_path}[/cyan]")
-        
         real_generator = ToaripiGenerator(model_path)
-        success = real_generator.load_model()
-        
-        if success and real_generator.model is not None:
+        success = real_generator.load()
+        if success:
             console.print("✅ [green]Real model loaded successfully![/green]")
-            display.set_generator(real_generator)
-            
             console.print("\n📝 [yellow]Testing Real Model Chat:[/yellow] What is water?")
-            english_response, toaripi_response = real_generator.generate_chat_response("What is water?")
-            display.display_bilingual_content(english_response, toaripi_response, "chat")
-            
+            eng3, tqo3 = real_generator.bilingual("What is water?", content_type="chat", max_length=40, temperature=0.7)
+            display.display(eng3, tqo3, "chat")
         else:
             console.print("⚠️  [yellow]Model loading failed, using demo mode[/yellow]")
     
@@ -104,21 +97,7 @@ def test_model_integration():
     console.print(f"Text: {sample_text}")
     
     # Show simulated weights
-    simulated_weights = generator._simulate_token_weights(sample_text)
-    console.print("\n🎭 [cyan]Simulated weights:[/cyan]")
-    for tw in simulated_weights:
-        color = tw.get_color_style()
-        console.print(f"  {tw.token}: {tw.weight:.2f}", style=color)
-    
-    # Show model-based weights (if available)
-    if 'real_generator' in locals() and real_generator.model is not None:
-        model_weights = real_generator.extract_token_weights_from_model("", sample_text)
-        console.print("\n🤖 [cyan]Model-based weights:[/cyan]")
-        for tw in model_weights:
-            color = tw.get_color_style()
-            console.print(f"  {tw.token}: {tw.weight:.2f}", style=color)
-    else:
-        console.print("\n🤖 [dim]Model-based weights: Not available (no trained model loaded)[/dim]")
+    console.print("\n🎭 [cyan]Token weights visualization handled by BilingualDisplay provider simulation.\n(No direct extraction test in refactored core)\n[/cyan]")
     
     # Show integration benefits
     console.print("\n💡 [green]Integration Benefits[/green]")

@@ -2,6 +2,8 @@
 
 **Welcome!** This guide will get you from zero to training Toaripi language models in under 5 minutes.
 
+Looking for a minimal copy/paste cross‑platform (Linux / WSL / Windows) cheat sheet? See `docs/QUICK_PLATFORM_START.md`.
+
 ## 🎯 Quick Start (Choose Your Method)
 
 ### Method 1: Automated Setup (Recommended)

@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from src.toaripi_slm.cli.commands.interact import BilingualDisplay, ToaripiGenerator
+from src.toaripi_slm.cli.core import BilingualDisplay, ToaripiGenerator
 
 def test_chat_functionality():
     """Test the chat Q&A functionality with token weight visualization."""
@@ -29,7 +29,7 @@ def test_chat_functionality():
     # Initialize components
     display = BilingualDisplay(console)
     generator = ToaripiGenerator(Path("./models/test"))
-    generator.load_model()
+    generator.load()
     
     console.print("\n📋 [bold cyan]Chat Q&A Testing[/bold cyan]\n")
     
@@ -52,13 +52,8 @@ def test_chat_functionality():
     
     for i, question in enumerate(test_questions, 1):
         console.print(f"📝 [yellow]Question {i}:[/yellow] {question}")
-        
-        # Generate chat response
-        english_response, toaripi_response = generator.generate_chat_response(question)
-        
-        # Display with token weights
-        display.display_bilingual_content(english_response, toaripi_response, "chat")
-        
+        eng, tqo = generator.bilingual(question, content_type="chat", max_length=50, temperature=0.7)
+        display.display(eng, tqo, "chat")
         console.print()  # Add spacing between questions
     
     # Test keyword extraction
@@ -74,8 +69,8 @@ def test_chat_functionality():
     
     for question in complex_questions:
         console.print(f"📝 [yellow]Complex Question:[/yellow] {question}")
-        english_response, toaripi_response = generator.generate_chat_response(question)
-        display.display_bilingual_content(english_response, toaripi_response, "chat")
+        eng, tqo = generator.bilingual(question, content_type="chat", max_length=50, temperature=0.7)
+        display.display(eng, tqo, "chat")
         console.print()
     
     # Test without token weights
@@ -84,8 +79,8 @@ def test_chat_functionality():
     
     question = "What is a teacher?"
     console.print(f"📝 [yellow]Question:[/yellow] {question}")
-    english_response, toaripi_response = generator.generate_chat_response(question)
-    display.display_bilingual_content(english_response, toaripi_response, "chat")
+    eng, tqo = generator.bilingual(question, content_type="chat", max_length=50, temperature=0.7)
+    display.display(eng, tqo, "chat")
     
     # Re-enable weights
     display.toggle_weights()
