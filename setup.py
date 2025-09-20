@@ -83,6 +83,8 @@ setup(
     },
     entry_points={
         "console_scripts": [
+            "toaripi=toaripi_slm.cli:main",
+            "toaripi-cli=toaripi_slm.cli:main",
             "toaripi-prepare-data=scripts.prepare_data:main",
             "toaripi-finetune=scripts.finetune:main",
             "toaripi-generate=scripts.generate:main",

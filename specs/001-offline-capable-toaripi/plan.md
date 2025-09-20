@@ -1,24 +1,25 @@
-# Implementation Plan: Offline-Capable Toaripi Educational Small Language Model (SLM)
 
-**Branch**: `001-offline-capable-toaripi` | **Date**: 2025-09-18 | **Spec**: `spec.md`
+# Implementation Plan: Web Interface for CSV Data Upload and Model Training
+
+**Branch**: `001-offline-capable-toaripi` | **Date**: 2025-09-20 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-offline-capable-toaripi/spec.md`
+**Arguments**: create a web interface that allows training the model by uploading new data in csv format it needs to be sleek and intuitive for users
 
 ## Execution Flow (/plan command scope)
-
-```text
+```
 1. Load feature spec from Input path
    → If not found: ERROR "No feature spec at {path}"
 2. Fill Technical Context (scan for NEEDS CLARIFICATION)
-   → Detect Project Type from context (single Python library + CLI/inference API)
-   → Set Structure Decision based on project type (Option 1: Single project) 
+   → Detect Project Type from context (web=frontend+backend, mobile=app+api)
+   → Set Structure Decision based on project type
 3. Fill the Constitution Check section based on the content of the constitution document.
 4. Evaluate Constitution Check section below
    → If violations exist: Document in Complexity Tracking
    → If no justification possible: ERROR "Simplify approach first"
    → Update Progress Tracking: Initial Constitution Check
 5. Execute Phase 0 → research.md
-   → All unknowns resolved (no blocking NEEDS CLARIFICATION remain)
-6. Execute Phase 1 → contracts, data-model.md, quickstart.md
+   → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
+6. Execute Phase 1 → contracts, data-model.md, quickstart.md, agent-specific template file (e.g., `CLAUDE.md` for Claude Code, `.github/copilot-instructions.md` for GitHub Copilot, `GEMINI.md` for Gemini CLI, `QWEN.md` for Qwen Code or `AGENTS.md` for opencode).
 7. Re-evaluate Constitution Check section
    → If new violations: Refactor design, return to Phase 1
    → Update Progress Tracking: Post-Design Constitution Check
@@ -26,151 +27,207 @@
 9. STOP - Ready for /tasks command
 ```
 
-## Summary
+**IMPORTANT**: The /plan command STOPS at step 7. Phases 2-4 are executed by other commands:
+- Phase 2: /tasks command creates tasks.md
+- Phase 3-4: Implementation execution (manual or via tools)
 
-Deliver a reproducible, offline-capable small Toaripi educational language model (≤7B params, ≤5GB quantized) that generates age-appropriate stories, vocabulary lists, Q&A pairs, and dialogues with safety filtering, deterministic "stable" mode, caching, and evaluation pack workflow to support language preservation in primary education contexts.
+## Summary
+This feature adds a sleek and intuitive web interface that allows users (primarily teachers and content contributors) to upload new training data in CSV format and initiate model training for the Toaripi SLM. The interface must integrate with the existing offline-capable educational model architecture while maintaining the constitutional requirements for reproducible training, cultural safety, and educational focus. The web interface will serve as the primary mechanism for expanding the parallel English↔Toaripi corpus and retraining models with new educational content.
 
 ## Technical Context
-
-**Language/Version**: Python 3.11  
-**Primary Dependencies**: transformers, datasets, accelerate, peft (LoRA), sentencepiece/tokenizers, fastapi (serving), pydantic, yaml  
-**Storage**: Local filesystem (data CSV/YAML configs, model artifacts, JSON logs); no external DB required  
-**Testing**: pytest (unit, integration, contract tests)  
-**Target Platform**: Linux/Windows CPU (8GB RAM) + optional Raspberry Pi 5 (ARM64) offline  
-**Project Type**: single  
-**Performance Goals**: Generation latency ≤10s (stories/Q&A/dialogue), ≤8s (vocabulary) p95 on baseline CPU; quantized model load ≤60s cold start  
-**Constraints**: Offline after install; model ≤7B params; quantized footprint ≤5GB; reproducible training (config + data checksums); safety filtering mandatory  
-**Scale/Scope**: Classroom/local usage; concurrent requests low (≤2 at a time); dataset initially hundreds to low thousands of aligned pairs
+**Language/Version**: Python 3.11+ (aligned with existing CLI infrastructure)  
+**Primary Dependencies**: FastAPI (web framework), Jinja2 (templates), Pydantic (validation), existing toaripi-slm package  
+**Storage**: Local filesystem for CSV uploads, existing model storage structure in `models/`  
+**Testing**: pytest (existing test framework), contract tests for API endpoints  
+**Target Platform**: Web application (localhost/server deployment), browser-based UI  
+**Project Type**: web (frontend + backend API)  
+**Performance Goals**: <3s CSV upload processing, <5min training initiation feedback, progress streaming  
+**Constraints**: Offline-capable after setup, ≤7B model params, reproducible training pipeline, cultural safety validation  
+**Scale/Scope**: Single-user interface, file uploads ≤50MB, batch processing of training data
 
 ## Constitution Check
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| Principle | Compliance | Notes |
-|-----------|------------|-------|
-| Minimal Viable Educational Model | YES | Scope limited strictly to four educational content types |
-| Reproducible Data & Training Pipeline | YES | YAML configs + data checksums + run metadata planned |
-| Test-First Quality Gates | YES | Contract & integration tests precede implementation; mock generation tests included |
-| Responsible & Culturally Safe Content | YES | Safety rules entity + lexical + threshold screening defined |
-| Simplicity, Observability & Versioning | YES | Single project layout; JSON structured logs; semantic version tagging |
-| Additional Constraints (size/offline) | YES | ≤7B params & offline constraints integrated |
-| Data Minimum | PARTIAL | Constitution minimum 100 pairs; spec raises to 150 (rationale: coverage) |
-| Storage Hygiene | YES | Artifacts isolated under models/; no checkpoints in src/ |
-| Documentation Requirement | YES | Quickstart + docstrings planned |
+**✅ I. Minimal Viable Educational Model**: Web interface supports core educational use case (data upload for training) without adding non-essential features. No chat/general-purpose functionality.
 
-No blocking violations. Rationale for raising minimum pairs: improved lexical diversity and more stable fine-tuning for low-resource language.
+**✅ II. Reproducible Data & Training Pipeline**: Interface will enforce CSV schema validation, generate immutable configs, timestamp uploads, and maintain checksum tracking for all training data.
+
+**✅ III. Test-First Quality Gates**: Will implement contract tests for upload API, data validation tests, and training pipeline integration tests before implementation.
+
+**✅ IV. Responsible & Culturally Safe Content**: Interface will include automated content filtering for uploaded CSV data, rejection of theological/adult/violent content, and manual review capabilities.
+
+**✅ V. Simplicity, Observability & Versioning**: Using FastAPI (Python ecosystem), structured JSON logging for uploads and training events, semantic versioning for interface components.
+
+**Additional Constitutional Compliance**:
+- ✅ Model size constraint: Interface won't modify model architecture (≤7B params maintained)
+- ✅ Hardware baseline: Web interface adds minimal overhead to existing CPU-only requirements  
+- ✅ Offline-first: Interface enables offline operation after initial setup and data upload
+- ✅ Config formats: Will generate YAML configs for training runs
+- ✅ Data minimum: Interface will enforce ≥150 aligned pairs before training
+- ✅ Storage hygiene: Uploaded files managed in appropriate directories, no raw checkpoints in src/
+- ✅ Documentation: Web interface components will include purpose and usage documentation
+
+**GATE STATUS: PASS** - No constitutional violations detected.
 
 ## Project Structure
 
-Retain existing repository layout (single library + specs). Add `contracts/` under spec folder and test contract files under `tests/contract/`.
+### Documentation (this feature)
+```
+specs/[###-feature]/
+├── plan.md              # This file (/plan command output)
+├── research.md          # Phase 0 output (/plan command)
+├── data-model.md        # Phase 1 output (/plan command)
+├── quickstart.md        # Phase 1 output (/plan command)
+├── contracts/           # Phase 1 output (/plan command)
+└── tasks.md             # Phase 2 output (/tasks command - NOT created by /plan)
+```
 
-**Structure Decision**: Option 1 (single project)
+### Source Code (repository root)
+```
+# Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
 
-## Phase 0: Outline & Research (research.md Summary)
+tests/
+├── contract/
+├── integration/
+└── unit/
 
-Focus Areas:
+# Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
 
-1. Model Base Selection: Choose a permissive 7B or smaller instruct-capable model with good multilingual tokenization (e.g., Mistral 7B Instruct) suitable for Toaripi (low-resource) adaptation.
-2. Tokenization Strategy: Evaluate existing tokenizer coverage for Toaripi; fallback: train SentencePiece unigram model on combined Toaripi corpus + small English sample; avoid fragmentation of Toaripi morphemes.
-3. Fine-Tune Approach: LoRA with low rank (r=16) + 4-bit quantization for memory efficiency; gradient checkpointing for resource limits.
-4. Data Augmentation: Only alignment-preserving (no hallucinated parallel pairs). Generate educational prompt templates from existing aligned verse semantics cautiously; avoid synthetic overfitting.
-5. Safety Filtering: Keyword set + simple pattern classification; human-in-loop review for evaluation pack.
-6. Deterministic Stable Mode: Fixed seed + temperature clamp + top-k fixed; record seed & decoding params.
-7. Latency Optimization: Quantized GGUF for llama.cpp inference; batch size=1; prompt trimming; early stop on sentence count.
-8. Evaluation Metrics: Loss/perplexity on validation subset; qualitative rubric (fluency, cultural safety, simplicity) via evaluation pack; track latency distribution.
-9. Logging & Metadata: JSON lines file with fields: timestamp, request_id, content_type, tokens_in/out, latency_ms, safety_status, model_version.
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
 
-Decisions (abbrev):
+# Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
 
-- Base Model: Mistral 7B Instruct (fits ≤7B constraint, strong efficiency)
-- Adaptation: LoRA only (no full fine-tune) for speed & reproducibility
-- Quantization: Q4_K_M GGUF for inference edge; 4-bit NF4 during training load (PEFT) where feasible
-- Tokenizer: Reuse base tokenizer first; measure OOV/fragmentation; if >15% subword fragmentation on Toaripi word list, train custom SP model
-- Min Data: 150 aligned pairs (internal); still respects constitution minimum (upgrade justification recorded)
+ios/ or android/
+└── [platform-specific structure]
+```
+
+**Structure Decision**: Option 2 (Web application) - Frontend + Backend detected in Technical Context
+
+**Rationale**: The user requirement for "sleek and intuitive web interface" clearly indicates a web application with browser-based UI and backend API for CSV processing and training orchestration.
+
+## Phase 0: Outline & Research
+1. **Extract unknowns from Technical Context** above:
+   - For each NEEDS CLARIFICATION → research task
+   - For each dependency → best practices task
+   - For each integration → patterns task
+
+2. **Generate and dispatch research agents**:
+   ```
+   For each unknown in Technical Context:
+     Task: "Research {unknown} for {feature context}"
+   For each technology choice:
+     Task: "Find best practices for {tech} in {domain}"
+   ```
+
+3. **Consolidate findings** in `research.md` using format:
+   - Decision: [what was chosen]
+   - Rationale: [why chosen]
+   - Alternatives considered: [what else evaluated]
+
+**Output**: research.md with all NEEDS CLARIFICATION resolved
 
 ## Phase 1: Design & Contracts
+*Prerequisites: research.md complete*
 
-Deliverables: data-model.md, contracts (API + internal service function schemas), quickstart.md, initial failing contract tests.
+1. **Extract entities from feature spec** → `data-model.md`:
+   - Entity name, fields, relationships
+   - Validation rules from requirements
+   - State transitions if applicable
 
-### Data Model Highlights
+2. **Generate API contracts** from functional requirements:
+   - For each user action → endpoint
+   - Use standard REST/GraphQL patterns
+   - Output OpenAPI/GraphQL schema to `/contracts/`
 
-Entities refined with validation constraints (ids UUIDv4, topic length 2–80, etc.). See `data-model.md`.
+3. **Generate contract tests** from contracts:
+   - One test file per endpoint
+   - Assert request/response schemas
+   - Tests must fail (no implementation yet)
 
-### API Contract Overview (FastAPI-style logical design)
+4. **Extract test scenarios** from user stories:
+   - Each story → integration test scenario
+   - Quickstart test = story validation steps
 
-| Endpoint | Method | Purpose | Request Schema | Response Schema |
-|----------|--------|---------|----------------|-----------------|
-| /generate | POST | Generate educational content | GenerateRequest | GenerateResponse |
-| /health | GET | Health/latency probe | n/a | HealthStatus |
-| /evaluation-pack | POST | Produce evaluation pack artifacts | EvalPackRequest | EvalPackResponse |
-| /safety/rules | GET | List active safety rules | n/a | SafetyRulesResponse |
-| /metadata/run | GET | Model & data version metadata | n/a | RunMetadata |
+5. **Update agent file incrementally** (O(1) operation):
+   - Run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot` for your AI assistant
+   - If exists: Add only NEW tech from current plan
+   - Preserve manual additions between markers
+   - Update recent changes (keep last 3)
+   - Keep under 150 lines for token efficiency
+   - Output to repository root
 
-Contract Schemas (summary):
+**Output**: data-model.md, /contracts/*, failing tests, quickstart.md, agent-specific file
 
-- GenerateRequest: topic, content_type(enum), target_length(optional bounded), mode(enum stable|standard), include_english_support(bool)
-- GenerateResponse: content_type, content_body(string or list), metadata(object), safety_status(enum), disclaimer_shown(bool)
-- EvalPackRequest: sample_count(optional default 12)
-- EvalPackResponse: pack_id, items(array of simplified generated artifacts metadata)
+## Phase 2: Task Planning Approach
+*This section describes what the /tasks command will do - DO NOT execute during /plan*
 
-### Quickstart Outline (planned quickstart.md)
+**Task Generation Strategy**:
+- Load `.specify/templates/tasks-template.md` as base
+- Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
+- Each contract → contract test task [P]
+- Each entity → model creation task [P] 
+- Each user story → integration test task
+- Implementation tasks to make tests pass
 
-1. Install dependencies
-2. Place aligned CSV in data/
-3. Run preprocessing script to validate & produce train/val splits
-4. Launch fine-tune script with YAML config (example provided)
-5. Export quantized model artifact
-6. Start local generation server (FastAPI) offline
-7. Run sample generation requests
-8. View logs & evaluation pack
+**Ordering Strategy**:
+- TDD order: Tests before implementation 
+- Dependency order: Models before services before UI
+- Mark [P] for parallel execution (independent files)
 
-### Constitution Re-Check (Post Design)
+**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
 
-All principles still met. Added justification recorded for raising data minimum.
+**IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
-## Phase 2: Task Planning Approach (Description Only)
+## Phase 3+: Future Implementation
+*These phases are beyond the scope of the /plan command*
 
-Task Generation Strategy:
-
-- Each endpoint → contract test + implementation task (test first)
-- Each entity field group → model/dataclass + validation tests
-- Safety filter pipeline → lexical list + threshold tests before integration
-- Training pipeline → config parse test → data loader test → tokenization coverage test → LoRA adapter integration test → generation sanity test
-- Performance tasks → latency measurement harness
-
-Ordering Strategy:
-
-1. Data validation & entities
-2. Contract schemas + tests
-3. Safety rule engine tests
-4. Generation service (mock model) tests
-5. Training pipeline scaffolding tests
-6. Real model integration & quantization export
-7. Performance & evaluation pack
-
-Parallelizable ([P]): entity models, individual endpoint contract tests, safety rule list curation.
-
-Estimated tasks: ~28.
+**Phase 3**: Task execution (/tasks command creates tasks.md)  
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking
+*Fill ONLY if Constitution Check has violations that must be justified*
 
-(No violations requiring justification.)
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+
 
 ## Progress Tracking
+*This checklist is updated during execution flow*
 
 **Phase Status**:
-
-- [x] Phase 0: Research complete (/plan command)
-- [x] Phase 1: Design complete (/plan command)
+- [ ] Phase 0: Research complete (/plan command)
+- [ ] Phase 1: Design complete (/plan command)
 - [ ] Phase 2: Task planning complete (/plan command - describe approach only)
 - [ ] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
-
-- [x] Initial Constitution Check: PASS
-- [x] Post-Design Constitution Check: PASS
-- [x] All NEEDS CLARIFICATION resolved
+- [ ] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] All NEEDS CLARIFICATION resolved
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v1.0.0 - See `/memory/constitution.md`*
+*Based on Constitution v2.1.1 - See `/memory/constitution.md`*

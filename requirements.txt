@@ -24,6 +24,10 @@ tqdm>=4.65.0
 requests>=2.31.0
 python-dotenv>=1.0.0
 
+# CLI interface
+click>=8.1.0
+rich>=13.0.0
+
 # Logging and monitoring
 loguru>=0.7.0
 wandb>=0.15.0

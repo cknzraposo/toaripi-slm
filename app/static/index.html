@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌺 Toaripi SLM - Educational Content Generator</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🌺 Toaripi SLM</h1>
+                    <p>Educational Content Generator</p>
+                </div>
+                <div class="system-status">
+                    <div class="status-indicator" id="system-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Checking...</span>
+                    </div>
+                    <div class="model-info" id="model-info">
+                        <span id="active-model">No model active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <nav class="tab-navigation">
+                <button class="tab-button active" data-tab="upload">
+                    📤 Data Upload
+                </button>
+                <button class="tab-button" data-tab="training">
+                    🧠 Model Training
+                </button>
+                <button class="tab-button" data-tab="generate">
+                    ✨ Content Generation
+                </button>
+            </nav>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Data Upload Tab -->
+                <div class="tab-pane active" id="upload-tab">
+                    <div class="section">
+                        <h2>📤 Upload Training Data</h2>
+                        <p class="section-description">
+                            Upload CSV files with English-Toaripi parallel text for model training.
+                            Files will be validated for quality and safety before processing.
+                        </p>
+
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <div class="upload-icon">📁</div>
+                                <h3>Drop CSV files here or click to browse</h3>
+                                <p>Supported formats: CSV with 'english' and 'toaripi' columns</p>
+                                <p>Maximum file size: 50MB</p>
+                                <input type="file" id="file-input" accept=".csv" multiple hidden>
+                                <button class="btn btn-primary" id="browse-button">Browse Files</button>
+                            </div>
+                        </div>
+
+                        <div class="upload-queue" id="upload-queue" style="display: none;">
+                            <h3>Upload Queue</h3>
+                            <div class="upload-items" id="upload-items"></div>
+                        </div>
+
+                        <div class="validation-results" id="validation-results" style="display: none;">
+                            <h3>Validation Results</h3>
+                            <div class="validation-summary" id="validation-summary"></div>
+                            <div class="validation-details" id="validation-details"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Training Tab -->
+                <div class="tab-pane" id="training-tab">
+                    <div class="section">
+                        <h2>🧠 Model Training</h2>
+                        <p class="section-description">
+                            Train new Toaripi language models using your uploaded data.
+                            Monitor training progress in real-time.
+                        </p>
+
+                        <!-- Model Selection -->
+                        <div class="model-selection">
+                            <h3>Base Model</h3>
+                            <select id="base-model-select" class="form-select">
+                                <option value="">Select a base model...</option>
+                                <option value="mistralai/Mistral-7B-Instruct-v0.2">Mistral 7B (Recommended)</option>
+                                <option value="microsoft/DialoGPT-medium">DialoGPT Medium</option>
+                                <option value="toaripi-base-v1">Toaripi Base v1 (if available)</option>
+                            </select>
+                        </div>
+
+                        <!-- Training Configuration -->
+                        <div class="training-config">
+                            <h3>Training Configuration</h3>
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <label>Learning Rate</label>
+                                    <select id="learning-rate">
+                                        <option value="2e-5" selected>2e-5 (Recommended)</option>
+                                        <option value="1e-5">1e-5 (Conservative)</option>
+                                        <option value="5e-5">5e-5 (Aggressive)</option>
+                                    </select>
+                                </div>
+                                <div class="config-item">
+                                    <label>Batch Size</label>
+                                    <select id="batch-size">
+                                        <option value="4" selected>4 (Recommended)</option>
+                                        <option value="2">2 (Low Memory)</option>
+                                        <option value="8">8 (High Memory)</option>
+                                    </select>
+                                </div>
+                                <div class="config-item">
+                                    <label>Epochs</label>
+                                    <select id="epochs">
+                                        <option value="3" selected>3 (Recommended)</option>
+                                        <option value="1">1 (Quick Test)</option>
+                                        <option value="5">5 (Extended)</option>
+                                    </select>
+                                </div>
+                                <div class="config-item">
+                                    <label>Use LoRA</label>
+                                    <input type="checkbox" id="use-lora" checked>
+                                    <span class="checkbox-label">Parameter-efficient fine-tuning</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Training Control -->
+                        <div class="training-control">
+                            <button class="btn btn-primary" id="start-training" disabled>
+                                🚀 Start Training
+                            </button>
+                            <button class="btn btn-secondary" id="stop-training" style="display: none;">
+                                🛑 Stop Training
+                            </button>
+                        </div>
+
+                        <!-- Training Progress -->
+                        <div class="training-progress" id="training-progress" style="display: none;">
+                            <h3>Training Progress</h3>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="progress-text" id="progress-text">0%</div>
+                            </div>
+                            <div class="training-stats" id="training-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Epoch:</span>
+                                    <span class="stat-value" id="current-epoch">0/0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Loss:</span>
+                                    <span class="stat-value" id="current-loss">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">ETA:</span>
+                                    <span class="stat-value" id="eta">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Speed:</span>
+                                    <span class="stat-value" id="training-speed">-</span>
+                                </div>
+                            </div>
+                            <div class="training-log" id="training-log">
+                                <h4>Training Log</h4>
+                                <div class="log-content" id="log-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Generation Tab -->
+                <div class="tab-pane" id="generate-tab">
+                    <div class="section">
+                        <h2>✨ Generate Educational Content</h2>
+                        <p class="section-description">
+                            Create stories, vocabulary exercises, dialogues, and Q&A content in Toaripi.
+                            All content is designed for educational use and cultural appropriateness.
+                        </p>
+
+                        <!-- Model Status -->
+                        <div class="model-status" id="generation-model-status">
+                            <div class="status-card">
+                                <h3>Active Model</h3>
+                                <div class="model-name" id="generation-active-model">No model loaded</div>
+                                <div class="model-actions">
+                                    <button class="btn btn-secondary" id="load-model-btn">Load Model</button>
+                                    <button class="btn btn-secondary" id="model-manager-btn">Manage Models</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Type Selection -->
+                        <div class="content-type-selection">
+                            <h3>Content Type</h3>
+                            <div class="content-type-grid">
+                                <div class="content-type-card active" data-type="story">
+                                    <div class="card-icon">📖</div>
+                                    <h4>Stories</h4>
+                                    <p>Educational stories with cultural elements</p>
+                                </div>
+                                <div class="content-type-card" data-type="vocabulary">
+                                    <div class="card-icon">📚</div>
+                                    <h4>Vocabulary</h4>
+                                    <p>Word lists and language exercises</p>
+                                </div>
+                                <div class="content-type-card" data-type="dialogue">
+                                    <div class="card-icon">💬</div>
+                                    <h4>Dialogues</h4>
+                                    <p>Conversational practice scenarios</p>
+                                </div>
+                                <div class="content-type-card" data-type="qa">
+                                    <div class="card-icon">❓</div>
+                                    <h4>Q&A</h4>
+                                    <p>Reading comprehension questions</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generation Form -->
+                        <div class="generation-form" id="generation-form">
+                            <!-- Story Generation -->
+                            <div class="generation-options active" id="story-options">
+                                <h3>Story Generation</h3>
+                                <div class="form-group">
+                                    <label>Story Prompt</label>
+                                    <textarea id="story-prompt" placeholder="Enter a story idea (e.g., 'Children learning to fish with their grandfather')"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Age Group</label>
+                                        <select id="story-age-group">
+                                            <option value="primary" selected>Primary School</option>
+                                            <option value="secondary">Secondary School</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Story Length</label>
+                                        <select id="story-length">
+                                            <option value="short">Short (3-5 sentences)</option>
+                                            <option value="medium" selected>Medium (6-10 sentences)</option>
+                                            <option value="long">Long (10+ sentences)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cultural Elements (optional)</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" value="fishing"> Fishing activities</label>
+                                        <label><input type="checkbox" value="village"> Village life</label>
+                                        <label><input type="checkbox" value="family"> Family relationships</label>
+                                        <label><input type="checkbox" value="nature"> Nature connection</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vocabulary Generation -->
+                            <div class="generation-options" id="vocabulary-options">
+                                <h3>Vocabulary Generation</h3>
+                                <div class="form-group">
+                                    <label>Topic</label>
+                                    <input type="text" id="vocab-topic" placeholder="Enter topic (e.g., 'fishing', 'family', 'nature')">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Age Group</label>
+                                        <select id="vocab-age-group">
+                                            <option value="primary" selected>Primary School</option>
+                                            <option value="secondary">Secondary School</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Word Count</label>
+                                        <select id="vocab-count">
+                                            <option value="5">5 words</option>
+                                            <option value="10" selected>10 words</option>
+                                            <option value="15">15 words</option>
+                                            <option value="20">20 words</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label><input type="checkbox" id="include-examples" checked> Include example sentences</label>
+                                </div>
+                            </div>
+
+                            <!-- Dialogue Generation -->
+                            <div class="generation-options" id="dialogue-options">
+                                <h3>Dialogue Generation</h3>
+                                <div class="form-group">
+                                    <label>Scenario</label>
+                                    <textarea id="dialogue-scenario" placeholder="Describe the conversation scenario (e.g., 'Father teaching child how to prepare fishing nets')"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Age Group</label>
+                                        <select id="dialogue-age-group">
+                                            <option value="primary" selected>Primary School</option>
+                                            <option value="secondary">Secondary School</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Participants</label>
+                                        <select id="dialogue-participants">
+                                            <option value="2" selected>2 people</option>
+                                            <option value="3">3 people</option>
+                                            <option value="4">4 people</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Q&A Generation -->
+                            <div class="generation-options" id="qa-options">
+                                <h3>Q&A Generation</h3>
+                                <div class="form-group">
+                                    <label>Source Text</label>
+                                    <textarea id="qa-text" placeholder="Paste the Toaripi text for which you want to generate comprehension questions"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Age Group</label>
+                                        <select id="qa-age-group">
+                                            <option value="primary" selected>Primary School</option>
+                                            <option value="secondary">Secondary School</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Question Count</label>
+                                        <select id="qa-count">
+                                            <option value="3">3 questions</option>
+                                            <option value="5" selected>5 questions</option>
+                                            <option value="8">8 questions</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Generate Button -->
+                            <div class="generation-control">
+                                <button class="btn btn-primary" id="generate-content" disabled>
+                                    ✨ Generate Content
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Generation Results -->
+                        <div class="generation-results" id="generation-results" style="display: none;">
+                            <div class="results-header">
+                                <h3>Generated Content</h3>
+                                <div class="results-actions">
+                                    <button class="btn btn-secondary" id="download-content">📥 Download</button>
+                                    <button class="btn btn-secondary" id="copy-content">📋 Copy</button>
+                                    <button class="btn btn-secondary" id="regenerate-content">🔄 Regenerate</button>
+                                </div>
+                            </div>
+                            <div class="results-content" id="results-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Toaripi SLM Project. Educational content generator for language preservation and learning.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loading-message">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="model-manager-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Model Manager</h3>
+                <button class="close-btn" onclick="closeModal('model-manager-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="model-list" id="model-list">
+                    <!-- Models will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/upload.js"></script>
+    <script src="/static/js/training.js"></script>
+    <script src="/static/js/generation.js"></script>
+    <script src="/static/js/models.js"></script>
+</body>
+</html>
