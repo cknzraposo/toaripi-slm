@@ -1,1 +1,7 @@
-# Core model and training components
+"""
+Core training components for Toaripi SLM.
+"""
+
+from .trainer import ToaripiTrainer, ToaripiTrainingConfig
+
+__all__ = ['ToaripiTrainer', 'ToaripiTrainingConfig']

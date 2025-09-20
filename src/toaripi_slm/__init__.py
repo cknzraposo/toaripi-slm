@@ -23,14 +23,17 @@ __license__ = "MIT"
 
 # Main imports
 try:
-    from .core import ToaripiTrainer
-    from .inference import ToaripiGenerator
+    from .core import ToaripiTrainer, ToaripiTrainingConfig
+    from .inference import ToaripiGenerator, ContentType, AgeGroup
     from .data import DataProcessor
     from .utils import load_config, setup_logging
     
     __all__ = [
         "ToaripiTrainer",
+        "ToaripiTrainingConfig",
         "ToaripiGenerator", 
+        "ContentType",
+        "AgeGroup",
         "DataProcessor",
         "load_config",
         "setup_logging",

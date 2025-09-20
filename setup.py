@@ -81,15 +81,15 @@ setup(
             "torch>=2.0.0",
         ],
     },
-    entry_points={
-        "console_scripts": [
-            "toaripi-prepare-data=scripts.prepare_data:main",
-            "toaripi-finetune=scripts.finetune:main",
-            "toaripi-generate=scripts.generate:main",
-            "toaripi-export=scripts.export_gguf:main",
-            "toaripi-serve=app.server:main",
-        ],
-    },
+    # entry_points={
+    #     "console_scripts": [
+    #         "toaripi-prepare-data=scripts.prepare_data:main",
+    #         "toaripi-finetune=scripts.finetune:main",
+    #         "toaripi-generate=scripts.generate:main",
+    #         "toaripi-export=scripts.export_gguf:main",
+    #         "toaripi-serve=app.server:main",
+    #     ],
+    # },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
