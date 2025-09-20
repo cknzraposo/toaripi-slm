@@ -23,6 +23,7 @@ toml>=0.10.2
 tqdm>=4.65.0
 requests>=2.31.0
 python-dotenv>=1.0.0
+click>=8.0.0
 
 # Logging and monitoring
 loguru>=0.7.0
