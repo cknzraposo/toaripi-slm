@@ -1,0 +1,25 @@
+{
+  "session_start": "2025-09-20T18:06:49.118384",
+  "session_end": "2025-09-20T18:11:03.143950",
+  "conversation_history": [
+    {
+      "timestamp": "2025-09-20T18:07:07.197847",
+      "user_input": "writa a story about a cat",
+      "model_output": "Mina na'a hanere na malolo peni. Na'a gete hanere na potopoto api na bada-bada. Ami hanere na'a nene kekeni mane-mane. Na'a gola-bada na toa hanere na kaikai bata-bata.",
+      "content_type": "story"
+    },
+    {
+      "timestamp": "2025-09-20T18:07:29.227426",
+      "user_input": "translate to english",
+      "model_output": "Mina na'a hanere na malolo peni. Na'a gete hanere na potopoto api na bada-bada. Ami hanere na'a nene kekeni mane-mane. Na'a gola-bada na toa hanere na kaikai bata-bata.",
+      "content_type": "story"
+    },
+    {
+      "timestamp": "2025-09-20T18:10:39.917739",
+      "user_input": "vocabulary",
+      "model_output": "Mina na'a hanere na malolo peni. Na'a gete hanere na potopoto api na bada-bada. Ami hanere na'a nene kekeni mane-mane. Na'a gola-bada na toa hanere na kaikai bata-bata.",
+      "content_type": "story"
+    }
+  ],
+  "total_exchanges": 3
+}

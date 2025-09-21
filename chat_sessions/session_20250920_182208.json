@@ -1,0 +1,25 @@
+{
+  "session_start": "2025-09-20T18:06:49.118384",
+  "session_end": "2025-09-20T18:22:08.424160",
+  "conversation_history": [
+    {
+      "timestamp": "2025-09-20T18:13:27.310164",
+      "user_input": "hello",
+      "model_output": "1. Hanere (fish) - gani malolo / 2. Peni (water) - drinking water / 3. Bada-bada (children) - young ones / 4. Kaikai (food) - what we eat",
+      "content_type": "vocabulary"
+    },
+    {
+      "timestamp": "2025-09-20T18:14:25.705802",
+      "user_input": "gani malolo",
+      "model_output": "Teacher: 'Ami na'a nene kekeni?' / Student: 'Mina na'a nene taumate.' / Teacher: 'Aba-harigi! Na'a nene-ida gola-bada.'",
+      "content_type": "dialogue"
+    },
+    {
+      "timestamp": "2025-09-20T18:16:49.340967",
+      "user_input": "where is the sun",
+      "model_output": "Mina na'a hanere na malolo peni api na gola-bada.",
+      "content_type": "translation"
+    }
+  ],
+  "total_exchanges": 3
+}
