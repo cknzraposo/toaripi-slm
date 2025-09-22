@@ -172,6 +172,7 @@ def show_welcome(ctx: CLIContext):
 # Import command groups from separate modules
 from .train import train
 from .data import data as data_commands
+from .model import model as model_commands
 
 # Add the training commands to the main CLI
 cli.add_command(train)
@@ -179,17 +180,8 @@ cli.add_command(train)
 # Add the data commands to the main CLI  
 cli.add_command(data_commands, name="data")
 
-
-@cli.group()
-@pass_context
-def model(ctx: CLIContext):
-    """
-    Model management and export operations.
-    
-    Export models for edge deployment, validate educational
-    content generation, and manage model versions.
-    """
-    ctx.log("Model operations", level="debug")
+# Add the model commands to the main CLI
+cli.add_command(model_commands, name="model")
 
 
 @cli.group()
