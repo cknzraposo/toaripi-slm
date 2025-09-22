@@ -24,7 +24,7 @@ setup(
     name="toaripi-slm",
     version="0.1.0",
     author="Toaripi SLM Contributors",
-    author_email="cknzraposo@gmail.com",
+    author_email="ck@raposo.ai",
     description="A small language model for generating educational content in Toaripi language",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -34,12 +34,20 @@ setup(
     python_requires=">=3.10",
     install_requires=read_requirements("requirements.txt"),
     extras_require={
-        "dev": read_requirements("requirements-dev.txt"),
-        "gpu": ["torch[cuda]>=2.0.0"],
+        "dev": [
+            "pytest>=7.4.0",
+            "pytest-cov>=4.1.0", 
+            "black>=23.7.0",
+            "isort>=5.12.0",
+            "flake8>=6.0.0",
+            "jupyter>=1.0.0"
+        ],
+        "gpu": ["torch>=2.0.0"],
         "gguf": ["llama-cpp-python>=0.1.78"],
     },
     entry_points={
         "console_scripts": [
+            "toaripi-slm=toaripi_slm.cli.main:cli",
             "toaripi-prepare-data=scripts.prepare_data:main",
             "toaripi-finetune=scripts.finetune:main", 
             "toaripi-generate=scripts.generate:main",

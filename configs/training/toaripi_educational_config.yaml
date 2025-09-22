@@ -1,0 +1,94 @@
+---
+# Toaripi Language Model Training Configuration
+# Educational content generation focus with defensive settings
+
+model:
+  # Model architecture settings
+  max_length: 512              # Maximum sequence length
+  use_gradient_checkpointing: true  # Memory optimization
+  cache_dir: null              # Use default cache
+
+training:
+  # Training parameters (defensive/conservative settings)
+  learning_rate: 2.0e-5        # Conservative learning rate
+  batch_size: 2                # Small batch for stability
+  validation_split: 0.2        # 80% train, 20% validation
+  num_epochs: 3                # Limited epochs to prevent overfitting
+  warmup_steps: 50             # Warmup steps
+  gradient_accumulation_steps: 4  # Effective batch size = 8
+  max_grad_norm: 1.0           # Gradient clipping
+  
+  # Technical settings
+  use_fp16: true               # Mixed precision for efficiency
+  save_steps: 100              # Checkpoint frequency
+  eval_steps: 100              # Evaluation frequency
+  logging_steps: 10            # Logging frequency
+  
+  # Educational safety
+  content_filtering: true      # Enable content filtering
+  cultural_validation: true   # Enable cultural validation
+  age_appropriate_only: true  # Only age-appropriate content
+
+data:
+  # Data processing settings
+  min_length: 10               # Minimum text length
+  max_length: 500              # Maximum text length
+  remove_duplicates: true      # Remove duplicate sentences
+  educational_score_threshold: 0.7  # Educational value threshold
+  
+  # Content validation
+  inappropriate_terms_check: true    # Check for inappropriate content
+  cultural_sensitivity_check: true  # Cultural sensitivity validation
+  primary_school_focus: true        # Focus on primary school content
+
+educational:
+  # Educational content parameters
+  content_types:
+    - story                    # Educational stories
+    - vocabulary              # Vocabulary exercises
+    - dialogue                # Simple dialogues
+    - question_answer         # Q&A content
+  
+  age_groups:
+    - primary_early           # Ages 5-7
+    - primary_middle          # Ages 8-10
+    - primary_late            # Ages 11-12
+  
+  # Cultural guidelines
+  toaripi_cultural_context: true     # Maintain cultural authenticity
+  papua_new_guinea_context: true    # PNG cultural awareness
+  village_life_focus: true          # Focus on village/community life
+  traditional_values: true          # Respect traditional values
+
+output:
+  # Output settings
+  save_model: true             # Save final model
+  save_tokenizer: true         # Save tokenizer
+  save_config: true            # Save configuration
+  generate_samples: true       # Generate sample outputs
+  
+logging:
+  # Logging configuration
+  level: INFO                  # Logging level
+  save_logs: true             # Save logs to file
+  console_output: true        # Show console output
+  
+# Model-specific settings for different architectures
+model_specific:
+  # Settings for small models (recommended for Toaripi)
+  small_models:
+    max_memory_gb: 8           # Maximum memory usage
+    cpu_only_fallback: true    # Fall back to CPU if needed
+    quantization: false        # Disable quantization for training
+  
+  # LoRA settings (Parameter-Efficient Fine-tuning)
+  lora:
+    enabled: true              # Use LoRA for efficient training
+    r: 16                      # LoRA rank
+    alpha: 32                  # LoRA alpha
+    dropout: 0.1               # LoRA dropout
+    target_modules:            # Target modules for LoRA
+      - "q_proj"
+      - "v_proj" 
+      - "k_proj"
+      - "o_proj"

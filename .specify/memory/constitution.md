@@ -1,50 +1,114 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: Initial version → 1.0.0
+- Added sections: All core principles and governance sections (initial creation)
+- Templates requiring updates: 
+  ✅ .specify/templates/plan-template.md (constitution check section aligns)
+  ✅ .specify/templates/spec-template.md (requirements alignment maintained)
+  ✅ .specify/templates/tasks-template.md (task categorization reflects principles)
+  ✅ .github/copilot-instructions.md (guidance references maintained)
+- Follow-up TODOs: None (all placeholders filled)
+-->
+
+# Toaripi SLM Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Educational-First Development
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Every feature MUST serve the educational mission of Toaripi language preservation and primary school learning. Features are evaluated against educational value before technical sophistication. All content generation MUST be age-appropriate (5-12 years), culturally sensitive to Papua New Guinea context, and aligned with primary school curriculum needs. No general-purpose chatbot features or theological content generation permitted.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: The project exists to empower Toaripi language preservation through education, not as a general AI platform. This constraint guides all technical decisions and prevents scope creep.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Defensive Programming (NON-NEGOTIABLE)
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All code MUST implement comprehensive input validation, error handling, and graceful degradation. Every public function MUST validate inputs, handle edge cases, and provide meaningful error messages. Cultural appropriateness checks are mandatory for all content generation paths. No assumptions about data quality, network availability, or external dependencies.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Educational tools require exceptional reliability since they serve communities with limited technical support. Defensive programming prevents data loss and ensures consistent user experience.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Test-First Quality Gates
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+TDD mandatory: Tests written → Stakeholder approved → Tests fail → Implementation begins. All public APIs require contract tests. All educational content generation requires validation tests. All data processing pipelines require integration tests. Test coverage minimum 85% for core modules, 70% for supporting modules.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: Educational software must be exceptionally reliable. Test-first ensures requirements are clear before implementation and prevents regressions that could disrupt learning.
+
+### IV. Performance for Edge Deployment
+
+All models MUST run on 8GB RAM minimum, prefer 4GB. Inference latency MUST be <2 seconds for content generation on CPU-only devices. Model size MUST be <5GB when quantized for Raspberry Pi deployment. Support offline operation without internet connectivity. Batch processing preferred over real-time for resource-intensive operations.
+
+**Rationale**: Target deployment includes remote Papua New Guinea communities with limited computational resources and unreliable internet connectivity.
+
+### V. Consistent Educational UX
+
+All interfaces (CLI, Web UI, API) MUST present consistent terminology and workflows. Error messages MUST be educational ("what went wrong, why, how to fix"). Progress indicators required for operations >3 seconds. All outputs MUST be culturally appropriate and age-group validated. Support both technical and non-technical users through layered complexity.
+
+**Rationale**: Teachers and educators have varying technical backgrounds. Consistent, educational UX reduces training overhead and increases adoption.
+
+## Educational Content Standards
+
+Educational content generation MUST follow primary school pedagogical principles. All generated stories, vocabulary, and exercises require cultural sensitivity validation. Content MUST avoid violence, adult themes, religious doctrine, or inappropriate cultural references. Age-appropriate language complexity enforced through automated scoring. Generated content MUST include learning objectives and assessment criteria.
+
+**Content Validation Pipeline**: Input sanitization → Cultural appropriateness check → Age-group validation → Educational value scoring → Output approval. Content scoring algorithm MUST be transparent and auditable by educators.
+
+## Technical Quality Standards
+
+### Code Quality Requirements
+
+- Python 3.10+ with type hints mandatory
+- Black code formatting and flake8 linting enforced
+- Docstrings required for all public functions (Google style)
+- Configuration via YAML/TOML only, no hardcoded values
+- Logging structured (JSON) with appropriate levels
+- Resource cleanup mandatory (context managers, try/finally)
+
+### Dependency Management
+
+- Pin exact versions in requirements.txt
+- Minimize dependencies for edge deployment compatibility
+- Document rationale for each major dependency
+- No dependencies with restrictive licenses
+- Regular security audits of dependency tree
+
+### Data Processing Standards
+
+- CSV/TSV formats preferred for transparency
+- UTF-8 encoding mandatory with BOM handling
+- Defensive encoding detection and conversion
+- Data validation before and after processing
+- Audit trails for all data transformations
+
+## Development Workflow
+
+### Code Review Gates
+
+- All PRs require constitution compliance check
+- Educational appropriateness review for content-related changes
+- Performance impact assessment for model/inference changes
+- Documentation updates for API changes
+- Test coverage verification before merge
+
+### Quality Assurance Process
+
+- Unit tests run on every commit
+- Integration tests on PR submission
+- Educational content validation on content changes
+- Performance regression testing on model updates
+- Manual testing following documented scenarios
+
+### Release Management
+
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- MAJOR: Educational approach changes, breaking API changes
+- MINOR: New content types, new features, significant UX improvements
+- PATCH: Bug fixes, content improvements, minor optimizations
+- All releases require educational stakeholder approval
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices and technical decisions. Amendments require documentation of rationale, stakeholder approval from educational partners, and migration plan for existing code. All pull requests and code reviews MUST verify constitutional compliance before approval.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Complexity that violates these principles MUST be justified with specific educational needs that simpler approaches cannot address. Technical debt that compromises educational mission or deployment constraints is not permitted.
+
+For runtime development guidance, refer to `.github/copilot-instructions.md` for AI assistance patterns and `README.md` for setup procedures.
+
+**Version**: 1.0.0 | **Ratified**: 2025-09-22 | **Last Amended**: 2025-09-22

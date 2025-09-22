@@ -143,16 +143,16 @@ def check_sample_data():
         import pandas as pd
         
         # Check parallel data CSV
-        csv_path = Path("data/samples/parallel_data.csv")
+        csv_path = Path("data/samples/sample_parallel.csv")
         if csv_path.exists():
             df = pd.read_csv(csv_path)
             if "english" in df.columns and "toaripi" in df.columns:
-                print(f"  ✓ parallel_data.csv ({len(df)} rows)")
+                print(f"  ✓ sample_parallel.csv ({len(df)} rows)")
             else:
-                print("  ✗ parallel_data.csv - missing required columns")
+                print("  ✗ sample_parallel.csv - missing required columns")
                 return False
         else:
-            print("  ✗ parallel_data.csv - missing")
+            print("  ✗ sample_parallel.csv - missing")
             return False
         
         # Check educational prompts JSON

@@ -15,38 +15,69 @@ import subprocess
 def validate_parallel_data(csv_path: str) -> bool:
     """Validate parallel English-Toaripi data format"""
     try:
-        with open(csv_path, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+        # Try different encodings
+        encodings = ['utf-8', 'latin1', 'cp1252', 'iso-8859-1']
+        df = None
+        
+        for encoding in encodings:
+            try:
+                import pandas as pd
+                df = pd.read_csv(csv_path, encoding=encoding)
+                print(f"✅ Successfully read file with {encoding} encoding")
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if df is None:
+            print(f"❌ Could not read file with any encoding")
+            return False
             
-        if not rows:
+        if len(df) == 0:
             print(f"❌ Empty file: {csv_path}")
             return False
             
+        print(f"📊 File contains {len(df)} rows")
+        print(f"📋 Columns: {list(df.columns)}")
+        
+        # Check for required columns (flexible)
         required_columns = {'english', 'toaripi'}
-        actual_columns = set(rows[0].keys())
+        actual_columns = set(df.columns)
         
         if not required_columns.issubset(actual_columns):
             missing = required_columns - actual_columns
-            print(f"❌ Missing columns: {missing}")
+            print(f"❌ Missing required columns: {missing}")
+            print(f"   Available columns: {list(actual_columns)}")
             return False
             
         # Check for empty values
-        empty_count = 0
-        for i, row in enumerate(rows):
-            if not row['english'].strip() or not row['toaripi'].strip():
-                empty_count += 1
-                if empty_count <= 5:  # Show first 5 examples
-                    print(f"⚠️  Row {i+1}: Empty value(s)")
+        empty_english = df['english'].isna().sum() + (df['english'] == '').sum()
+        empty_toaripi = df['toaripi'].isna().sum() + (df['toaripi'] == '').sum()
         
-        print(f"✅ Validated {len(rows)} parallel sentences")
-        if empty_count > 0:
-            print(f"⚠️  Found {empty_count} rows with empty values")
+        print(f"📈 Data quality:")
+        print(f"   Empty English entries: {empty_english}")
+        print(f"   Empty Toaripi entries: {empty_toaripi}")
+        
+        # Show sample data
+        print(f"\n📋 Sample data:")
+        for i, row in df.head(3).iterrows():
+            eng_text = str(row['english'])[:80] + "..." if len(str(row['english'])) > 80 else str(row['english'])
+            to_text = str(row['toaripi'])[:80] + "..." if len(str(row['toaripi'])) > 80 else str(row['toaripi'])
+            print(f"   Row {i+1}:")
+            print(f"     EN: {eng_text}")
+            print(f"     TO: {to_text}")
+        
+        valid_pairs = len(df) - max(empty_english, empty_toaripi)
+        print(f"\n✅ Validation complete: {valid_pairs} valid parallel sentences")
+        
+        if empty_english > 0 or empty_toaripi > 0:
+            print(f"⚠️  Recommended: Clean data to remove {max(empty_english, empty_toaripi)} incomplete pairs")
             
         return True
         
     except Exception as e:
         print(f"❌ Error validating {csv_path}: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
