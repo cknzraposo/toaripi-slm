@@ -173,6 +173,7 @@ def show_welcome(ctx: CLIContext):
 from .train import train
 from .data import data as data_commands
 from .model import model as model_commands
+from .serve import serve as serve_commands
 
 # Add the training commands to the main CLI
 cli.add_command(train)
@@ -183,35 +184,8 @@ cli.add_command(data_commands, name="data")
 # Add the model commands to the main CLI
 cli.add_command(model_commands, name="model")
 
-
-@cli.group()
-@pass_context
-def serve(ctx: CLIContext):
-    """
-    Serving and deployment operations.
-    
-    Start inference servers, validate deployments, and
-    test educational content generation endpoints.
-    """
-    ctx.log("Serving operations", level="debug")
-
-
-@serve.command()
-@click.option("--model", required=True, help="Model path for serving")
-@click.option("--host", default="localhost", help="Server host")
-@click.option("--port", default=8000, help="Server port")
-@click.option("--cpu-only", is_flag=True, help="Force CPU-only inference")
-@pass_context
-def start_server(ctx: CLIContext, model: str, host: str, port: int, cpu_only: bool):
-    """Start inference server for educational content generation."""
-    ctx.log(f"Starting server with model: {model}", level="info")
-    ctx.log(f"Server will run on {host}:{port}", level="info")
-    
-    if cpu_only:
-        ctx.log("CPU-only mode enabled for edge deployment", level="info")
-    
-    # TODO: Implement server startup logic
-    console.print("[yellow]Server implementation coming soon...[/yellow]")
+# Add the serve commands to the main CLI
+cli.add_command(serve_commands, name="serve")
 
 
 # Helper commands
