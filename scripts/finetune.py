@@ -9,21 +9,22 @@ on Toaripi educational content with defensive programming and validation.
 import argparse
 import sys
 from pathlib import Path
-import yaml
 import logging
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 
 # Add the src directory to Python path for local imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from toaripi_slm.data import (
-    ToaripiParallelDataset, 
-    ContentType, 
+    ToaripiParallelDataset,
+    ContentType,
     AgeGroup,
-    create_dataloaders
+    create_dataloaders,
 )
 from toaripi_slm.core import ModelConfig, ToaripiModelWrapper
+from toaripi_slm.config import load_config, TrainingConfig
+from toaripi_slm.utils.paths import ProjectPaths
 from toaripi_slm.utils import (
     setup_logger,
     ensure_dir, 
@@ -32,31 +33,6 @@ from toaripi_slm.utils import (
     get_device_info,
     validate_file_path
 )
-
-
-def load_training_config(config_path: Path) -> Dict[str, Any]:
-    """Load and validate training configuration."""
-    try:
-        with open(config_path, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        # Validate required sections
-        required_sections = ['model', 'training', 'data']
-        for section in required_sections:
-            if section not in config:
-                raise ValueError(f"Missing required config section: {section}")
-        
-        # Set defaults
-        config.setdefault('educational', {
-            'content_filtering': True,
-            'cultural_validation': True,
-            'age_appropriate_only': True
-        })
-        
-        return config
-        
-    except Exception as e:
-        raise RuntimeError(f"Failed to load config from {config_path}: {e}")
 
 
 def validate_training_data(data_path: Path, min_samples: int = 100) -> bool:
@@ -96,7 +72,7 @@ def create_training_datasets(
     tokenizer_name: str,
     validation_split: float = 0.2,
     max_length: int = 512
-) -> tuple:
+) -> Tuple[Any, Any, Any]:
     """Create training and validation datasets."""
     logger = logging.getLogger(__name__)
     
@@ -138,16 +114,12 @@ def create_training_datasets(
 
 
 def setup_output_directory(base_path: Path, model_name: str) -> Path:
-    """Set up output directory with timestamp."""
+    """Set up timestamped output directory under provided base path."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_simple = model_name.split('/')[-1]  # Get model name without org
+    model_simple = model_name.split("/")[-1]
     output_dir = base_path / f"toaripi_{model_simple}_{timestamp}"
-    
-    ensure_dir(output_dir)
-    ensure_dir(output_dir / "logs")
-    ensure_dir(output_dir / "checkpoints")
-    ensure_dir(output_dir / "final_model")
-    
+    for sub in [output_dir, output_dir / "logs", output_dir / "checkpoints", output_dir / "final_model"]:
+        ensure_dir(sub)
     return output_dir
 
 
@@ -183,7 +155,7 @@ def main():
         "--model-name",
         type=str,
         default="microsoft/DialoGPT-small",
-        help="HuggingFace model identifier"
+        help="Override base model name (else uses config.model.name)"
     )
     parser.add_argument(
         "--dry-run",
@@ -200,7 +172,11 @@ def main():
     
     # Set up logging
     log_level = logging.DEBUG if args.verbose else logging.INFO
-    output_dir = setup_output_directory(args.output, args.model_name)
+    # If user passes '.' or root models dir, place run under standardized training_runs
+    base_output = args.output
+    if str(base_output).strip() in {'.', './', ''}:
+        base_output = ProjectPaths.training_runs()
+    output_dir = setup_output_directory(base_output, args.model_name)
     log_file = output_dir / "logs" / "training.log"
     
     logger = setup_logger(
@@ -215,8 +191,13 @@ def main():
     
     try:
         # Load configuration
-        logger.info(f"Loading configuration from: {args.config}")
-        config = load_training_config(args.config)
+        logger.info(f"Loading unified training configuration from: {args.config}")
+        training_cfg: TrainingConfig = load_config(str(args.config), "training")
+        # Allow runtime override of model name via CLI if different
+        base_model_name = args.model_name or training_cfg.model.name
+        if base_model_name != training_cfg.model.name:
+            logger.info(f"Overriding config model.name {training_cfg.model.name} -> {base_model_name}")
+            training_cfg.model.name = base_model_name  # type: ignore[attr-defined]
         
         # Show device information
         device_info = get_device_info()
@@ -237,15 +218,15 @@ def main():
             sys.exit(1)
         
         # Save configuration for reproducibility
-        config_copy = config.copy()
-        config_copy['runtime'] = {
-            'model_name': args.model_name,
+        config_serializable = training_cfg.model_dump()
+        config_serializable['runtime'] = {
+            'model_name': base_model_name,
             'data_path': str(args.data),
             'output_dir': str(output_dir),
             'timestamp': datetime.now().isoformat(),
             'device_info': device_info
         }
-        safe_json_save(config_copy, output_dir / "training_config.json")
+        safe_json_save(config_serializable, output_dir / "training_config.json")
         
         if args.dry_run:
             logger.info("Dry run completed successfully - setup is valid")
@@ -254,20 +235,21 @@ def main():
         
         # Create datasets
         logger.info("Creating training datasets...")
-        train_dataset, val_dataset, tokenizer = create_training_datasets(
+        _train_dataset, _val_dataset, _tokenizer = create_training_datasets(
             data_path=args.data,
-            tokenizer_name=args.model_name,
-            validation_split=config['training'].get('validation_split', 0.2),
-            max_length=config['model'].get('max_length', 512)
+            tokenizer_name=base_model_name,
+            validation_split=training_cfg.training.validation_split,
+            max_length=training_cfg.model.max_length,
         )
         
         # Initialize model wrapper
         logger.info(f"Initializing model: {args.model_name}")
         model_config = ModelConfig(
-            model_name=args.model_name,
-            max_length=config['model'].get('max_length', 512),
-            use_fp16=config['training'].get('use_fp16', True),
-            device_map="auto"
+            model_name=base_model_name,
+            max_length=training_cfg.model.max_length,
+            use_fp16=training_cfg.training.use_fp16 if training_cfg.training.use_fp16 is not None else True,
+            device_map=training_cfg.model.device_map,
+            cache_dir=Path(training_cfg.model.cache_dir) if training_cfg.model.cache_dir else None,
         )
         
         model_wrapper = ToaripiModelWrapper(model_config)
