@@ -52,7 +52,7 @@ class TestCLIBasics:
         runner = CliRunner()
         result = runner.invoke(cli, ['validate'])
         assert result.exit_code == 0
-        assert 'Educational content validation' in result.output or 'Validation complete' in result.output
+        assert 'Validating all configuration' in result.output or 'Validation Result:' in result.output
 
 
 class TestDataCommands:
