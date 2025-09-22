@@ -1,0 +1,46 @@
+# Toaripi SLM Launcher Configuration
+# Configuration for educational content generation and cultural preservation
+# See docs/usage/CONFIGURATION_GUIDE.md for detailed explanations
+
+educational:
+  age_groups:
+  - primary_lower
+  content_types:
+  - story
+  validation_level: educational
+  cultural_sensitivity: true
+  max_content_length: 256
+  language_preservation_mode: true
+training:
+  model_name: microsoft/DialoGPT-small
+  epochs: 2
+  batch_size: 4
+  learning_rate: 2.0e-05
+  use_lora: true
+  lora_rank: 16
+  lora_alpha: 32
+  max_length: 256
+  device: auto
+  gradient_accumulation_steps: 1
+  warmup_steps: 100
+  save_steps: 500
+  eval_steps: 100
+  logging_steps: 50
+system:
+  python_version_min: '3.10'
+  virtual_env_required: true
+  auto_install_dependencies: true
+  auto_create_venv: true
+  check_gpu_availability: true
+  memory_limit_gb: null
+  disk_space_required_gb: 10
+ui:
+  show_welcome_message: true
+  use_rich_formatting: true
+  show_progress_bars: true
+  auto_scroll: true
+  theme: default
+  beginner_mode: true
+  teacher_mode: false
+  verbose_logging: true
+version: 1.0.0
