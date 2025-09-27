@@ -44,7 +44,6 @@ venv.bak/
 # Model files and data (large files)
 checkpoints/
 models/
-data/raw/
 data/processed/
 *.bin
 *.safetensors
